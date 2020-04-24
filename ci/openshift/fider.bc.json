@@ -25,7 +25,7 @@
     {
       "name": "SOURCE_REPOSITORY_REF",
       "required": true,
-      "value": "master"
+      "value": "feature/submodule"
     }
   ],
   "objects": [
