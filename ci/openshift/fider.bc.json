@@ -1,0 +1,80 @@
+{
+  "kind": "Template",
+  "apiVersion": "template.openshift.io/v1",
+  "metadata": {
+    "name": "nrm-feedback-bc"
+  },
+  "parameters": [
+    {
+      "name": "NAME",
+      "displayName": "Name",
+      "description": "A descriptive name of the image",
+      "value": "fider-notls",
+      "required": true
+    },
+    {
+      "name": "VERSION",
+      "required": true,
+      "value": "v0.18"
+    },
+    {
+      "name": "SOURCE_REPOSITORY_URL",
+      "required": true,
+      "value": "https://github.com/garywong-bc/nrm-feedback"
+    },
+    {
+      "name": "SOURCE_REPOSITORY_REF",
+      "required": true,
+      "value": "master"
+    }
+  ],
+  "objects": [
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "nrm-feedback",
+        "labels": {
+          "build": "nrm-feedback"
+        }
+      },
+      "spec": {
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "${SOURCE_REPOSITORY_URL}",
+            "ref": "${SOURCE_REPOSITORY_REF}",
+            "contextDir": "fider"            
+          }
+        },
+        "strategy": {
+          "type": "Docker",
+          "dockerStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "csnr-devops-lab-tools",
+              "name": "alpine:3.10"
+            }
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "${NAME}:${VERSION}"
+          }
+        },
+        "resources": {
+          "limits": {
+            "cpu": "200m",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "memory": "1Gi"
+          }
+        }
+      }
+    }
+  ]
+}

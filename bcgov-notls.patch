@@ -1,0 +1,47 @@
+diff --git a/app/services/email/smtp/smtp.go b/app/services/email/smtp/smtp.go
+index 41c72cb1..25886e53 100644
+--- a/app/services/email/smtp/smtp.go
++++ b/app/services/email/smtp/smtp.go
+@@ -88,8 +88,7 @@ func sendMail(ctx context.Context, c *cmd.SendMail) {
+ 
+ 		smtpConfig := env.Config.Email.SMTP
+ 		servername := fmt.Sprintf("%s:%s", smtpConfig.Host, smtpConfig.Port)
+-		auth := authenticate(smtpConfig.Username, smtpConfig.Password, smtpConfig.Host)
+-		err = Send(localname, servername, auth, email.NoReply, []string{to.Address}, b.Bytes())
++		err = Send(localname, servername, email.NoReply, []string{to.Address}, b.Bytes())
+ 		if err != nil {
+ 			panic(errors.Wrap(err, "failed to send email with template %s", c.TemplateName))
+ 		}
+@@ -97,7 +96,7 @@ func sendMail(ctx context.Context, c *cmd.SendMail) {
+ 	}
+ }
+ 
+-var Send = func(localName, serverAddress string, a gosmtp.Auth, from string, to []string, msg []byte) error {
++var Send = func(localName, serverAddress string, from string, to []string, msg []byte) error {
+ 	host, _, _ := net.SplitHostPort(serverAddress)
+ 	c, err := gosmtp.Dial(serverAddress)
+ 	if err != nil {
+@@ -108,19 +107,14 @@ var Send = func(localName, serverAddress string, a gosmtp.Auth, from string, to
+ 		return err
+ 	}
+ 	if ok, _ := c.Extension("STARTTLS"); ok {
+-		config := &tls.Config{ServerName: host}
++		config := &tls.Config{
++			InsecureSkipVerify: true,
++			ServerName: host,
++		}
+ 		if err = c.StartTLS(config); err != nil {
+ 			return err
+ 		}
+ 	}
+-	if a != nil {
+-		if ok, _ := c.Extension("AUTH"); !ok {
+-			return errors.New("smtp: server doesn't support AUTH")
+-		}
+-		if err = c.Auth(a); err != nil {
+-			return err
+-		}
+-	}
+ 	if err = c.Mail(from); err != nil {
+ 		return err
+ 	}
