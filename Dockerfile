@@ -4,7 +4,7 @@ FROM getfider/githubci:0.0.2 AS builder
 RUN mkdir /app
 WORKDIR /app
 
-COPY . .
+COPY fider .
 RUN npm ci
 RUN node -v 
 RUN npm -v 
