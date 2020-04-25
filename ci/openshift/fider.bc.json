@@ -9,13 +9,13 @@
       "name": "NAME",
       "displayName": "Name",
       "description": "A descriptive name of the image",
-      "value": "fider-notls",
+      "value": "fider-gitsubmodule",
       "required": true
     },
     {
       "name": "VERSION",
       "required": true,
-      "value": "v0.18"
+      "value": "latest"
     },
     {
       "name": "SOURCE_REPOSITORY_URL",
