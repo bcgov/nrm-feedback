@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    env_file:
+    - ./.env  
+    restart: always
+    image: postgres:9.6
+    volumes:
+      - ./var/fider/pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+  app:
+    env_file:
+    - ./.env   
+    restart: always
+    build:
+      context: ./fider
+      dockerfile: ../Dockerfile
+    ports:
+      - "9999:3000"
+    depends_on:
+      - db
