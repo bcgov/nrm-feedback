@@ -9,7 +9,7 @@
       "name": "NAME",
       "displayName": "Name",
       "description": "A descriptive name of the image",
-      "value": "fider-notls",
+      "value": "fider-submodule",
       "required": true
     },
     {
