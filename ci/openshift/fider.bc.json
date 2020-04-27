@@ -44,7 +44,9 @@
           "type": "Git",
           "git": {
             "uri": "${SOURCE_REPOSITORY_URL}",
-            "ref": "${SOURCE_REPOSITORY_REF}"
+            "ref": "${SOURCE_REPOSITORY_REF}",
+            "contextDir": "./fider",
+            "dockerfile": "../Dockerfile" 
           }
         },
         "strategy": {
@@ -65,12 +67,12 @@
         },
         "resources": {
           "limits": {
-            "cpu": "200m",
-            "memory": "1Gi"
+            "cpu": "250m",
+            "memory": "2048Mi"     
           },
           "requests": {
             "cpu": "100m",
-            "memory": "1Gi"
+            "memory": "1024Mi"
           }
         }
       }
