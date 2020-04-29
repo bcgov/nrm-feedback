@@ -7,7 +7,6 @@
   - [Files](#files)
   - [Build](#build)
   - [Deploy](#deploy)
-  - [Perform Fider installation](#perform-fider-installation)
   - [Example Deployment](#example-deployment)
   - [Using Environmental variables to deploy](#using-environmental-variables-to-deploy)
   - [FAQ](#faq)
@@ -15,7 +14,6 @@
   - [SMTPS Issue](#smtps-issue)
 
 <!-- /TOC -->
-
 
 # NRM Fider
 
@@ -41,8 +39,8 @@ Once deployed, any visitors to the site will require a modern web browser (e.g. 
 
 ## Files
 
-* [OpenShift Fider app template](/ci/openshift/fider-bcgov.dc.json) for Fider application
-* [OpenShift Database service template](/ci/openshift/postgresql.dc.json) for PostgreSQL Database, acting as the datastore for the Fider application
+* [OpenShift Fider app template](/ci/openshift/fider-bcgov.dc.yaml) for Fider application
+* [OpenShift Database service template](/ci/openshift/postgresql.dc.yaml) for PostgreSQL Database, acting as the datastore for the Fider application
 
 ## Build
 
@@ -50,9 +48,10 @@ Once deployed, any visitors to the site will require a modern web browser (e.g. 
 
 To create an image stream using this forked code (replace `<tools-namespace>` with your `-tools` project namespace).
 
-> oc -n &lt;tools-namespace&gt; create istag fider-bcgov:latest
+> oc -n &lt;tools-namespace&gt; create istag fider-bcgov:latest  
 
-> oc -n &lt;tools-namespace&gt;  process -f ci/openshift/fider-bcgov.bc.json | oc -n &lt;tools-namespace&gt;  apply -f -
+> oc -n &lt;tools-namespace&gt;  process -f ci/openshift/fider-bcgov.bc.yaml | oc -n &lt;tools-namespace&gt;  apply -f -  
+
 > oc -n &lt;tools-namespace&gt; start-build nrm-feedback
 
 Tag with the correct release version,  matching the `major.minor`  release tag at the source [repo](https://github.com/getfider/fider/releases).  For example:
@@ -67,41 +66,43 @@ NOTE: To update our Fider image, we would update the submodule (e.g. `0.19.0`) a
 
 If and when we solve the SMTPS issue, we should build directly off the Fider image, referencing `https://github.com/getfider/fider` in the deployment, and no longer use custom builds.
 
-
 ## Deploy
 
 ### Database Deployment
 
 Deploy the DB using the correct FEEDBACK_NAME parameter (e.g. an acronym that is prefixed to `fider`):
 
-> oc -n &lt;project&gt; new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;
+> oc -n &lt;project&gt; new-app --file=./ci/openshift/postgresql.dc.yaml -p FEEDBACK_NAME=&lt;feedback&gt;
 
 All DB deployments are based on the out-of-the-box [OpenShift Database Image](https://docs.openshift.com/container-platform/3.11/using_images/db_images/postgresql.html).
 
+#### Prepare DB for application install
+
+Although Fider is setup to *auto-install* upon deployment, the OpenShift DB template disallows the application account to install DB extensions.  Therefore, run the the following via `oc rsh`, with the correct FEEDBACK_NAME and credentials:
+
+> oc -n &lt;project&gt; rsh $(oc -n &lt;project&gt; get pods | grep -v &lt;feedback&gt;fider-postgresql- | grep Running | awk '{print $1}')
+
+oc -n <project> rsh $(oc -n <project> get pods | grep <survey>limesurvey-app- | grep -v deploy | grep Running | head -n 1 | awk '{print $1}')
+
+> psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
+
+NOTE: the `${POSTGRESQL_DATABASE}` text is exactly as written, since the app has access to these environment variables (set during the `new-app` step above).
+
 ### Application Deployment
 
-Deploy the Application specifying:   
+Deploy the Application specifying:
+
 * the feedback-specific parameter (i.e. `<feedback>fider`)
 * your project namespace that contains the image, and 
 * a `@gov.bc.ca` email account that will be used with the `apps.smtp.gov.bc.ca` SMTP Email Server:
 
-> oc -n &lt;project&gt; new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;fider -p IS_NAMESPACE=&lt;tools-namespace&gt; EMAIL_SMTP_USERNAME=&lt;Email.Address&gt;@gov.bc.ca
+> oc -n &lt;project&gt; new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=&lt;feedback&gt;fider -p IS_NAMESPACE=&lt;tools-namespace&gt; -p EMAIL_SMTP_USERNAME=&lt;Email.Address&gt;@gov.bc.ca
 
-## Perform Fider installation
+#### Log into the Fider installation
 
-Although Fider is setup to *auto-install* upon deployment, the OpenShift DB template disallows the application account to install DB extensions.  Therefore, run the the following via `oc rsh`, with the correct FEEDBACK_NAME and credentials:
+After sixty seconds, the application will have finished the initial install.  Open the app in a browser, to set the admin user.  The URL will be of the form `https://<xyz>fider.pathfinder.gov.bc.ca/`.
 
-> oc -n &lt;project&gt; rsh $(oc -n &lt;project&gt; get pods | grep &lt;feedback&gt;fider-postgresql- | grep Running | awk '{print $1}')
-
-> psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
-
-NOTE that the `${POSTGRESQL_DATABASE}` text is exactly as written, since the app has access to these environment variables (set during the `new-app` step above).
-
-### Log into the Fider installation
-
-Once the application has finished the initial install, open the app in a browser, to set the admin user.  The URL will be of the form `https://<xyz>fider.pathfinder.gov.bc.ca/`.
-
-### Reset database account privileges
+#### Reset database account privileges
 
 Revoke the superuser privilege afterwards:
 
@@ -119,15 +120,15 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
 
 ### Database Deployment
 
-> oc -n csnr-devops-lab-deploy new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=acmefider
+> oc -n csnr-devops-lab-deploy new-app --file=./ci/openshift/postgresql.dc.yaml -p FEEDBACK_NAME=acmefider
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "ci/openshiftpostgresql.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "./ci/openshift/postgresql.dc.yaml" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Feedback Name=acmefider
         * Memory Limit=512Mi
-        * PostgreSQL Connection Password=wAktZce2pIt5O8Y3 # generated
+        * PostgreSQL Connection Password=PqQxC04RijgnWgCy # generated
         * Database Volume Capacity=2Gi
 
 --> Creating resources ...
@@ -137,16 +138,33 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
     service "acmefider-postgresql" created
 --> Success
     Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
-     'oc expose svc/acmefider-postgresql' 
-    Run 'oc status' to view your app.
+     'oc expose svc/acmefider-postgresql'
 ```
+
+#### Prepare DB for application install
+
+After thirty seconds, the database pod should be up.
+
+> oc -n csnr-devops-lab-deploy rsh $(oc -n csnr-devops-lab-deploy get pods | grep acmefider-postgresql- | grep Running | awk '{print $1}')
+
+Run the install commands in this shell:
+
+> psql ${POSTGRESQL_DATABASE} -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
+
+The database responds with:
+
+```bash
+ALTER ROLE
+```
+
+Type `exit` to exit the remote shell.
 
 ### Application Deployment
 
-> oc -n csnr-devops-lab-deploy new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=acmefider -p IS_NAMESPACE=csnr-devops-lab-tools EMAIL_SMTP_USERNAME=Porky.Pig@gov.bc.ca
+> oc -n csnr-devops-lab-deploy new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=acmefider -p IS_NAMESPACE=csnr-devops-lab-tools EMAIL_SMTP_USERNAME=Porky.Pig@gov.bc.ca
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.yaml" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Namespace=csnr-devops-lab-tools
@@ -155,7 +173,7 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
         * Feedback Product Name=acmefider
         * Fider Go Environment=production
         * Fider application logging level=INFO
-        * Fider Go Environment=3KtO32hUVd1VbpAgudiskTNekps3jtzb # generated
+        * Fider Go Environment=s4LbrH38y0dHY6tUcFFJTbu676aAeSp5 # generated
         * SMTP Host=apps.smtp.gov.bc.ca
         * SMTP Port=25
         * SMTP User=Gary.T.Wong@gov.bc.ca
@@ -180,30 +198,13 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
     service "acmefider" created
     route.route.openshift.io "acmefider" created
 --> Success
-    Access your application via route 'acmefider.pathfinder.gov.bc.ca'
+    Access your application via route 'acmefider.pathfinder.gov.bc.ca' 
     Run 'oc status' to view your app.
 ```
 
-#### Perform Fider installation
+#### Log into the Fider app
 
-After 10 - 30 seconds, at least one pod should be up; remote into any one of these pods:
-
-> oc -n csnr-devops-lab-deploy rsh $(oc -n csnr-devops-lab-deploy get pods | grep acmefider-postgresql- | grep Running | awk '{print $1}')
-
-Run the install commands in this shell:
-
-> psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
-
-The database responds with:
-```bash
-ALTER ROLE
-```
-
-Type `exit` to exit the remote shell.
-
-### Log into the Fider app
-
-The app is at https://acmefider.pathfinder.gov.bc.ca but will initially redirect you to https://acmefider.pathfinder.gov.bc.ca/signup, bringing you the screen:
+After sixty seconds, the application will be ready to accept connections at https://acmefider.pathfinder.gov.bc.ca.  Initially, this redirect you to https://acmefider.pathfinder.gov.bc.ca/signup, bringing you the screen:
 ![Admin SignUp](/docs/screenshots/SignUp.png)
 
 Once you've confirmed the setup detail, you'll be sent a confirmation email, and you'll have to click the embedded link:
@@ -228,15 +229,15 @@ export FEEDBACK=iitd
 
 ### Database Deployment
 
-> oc -n ${PROJECT} new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider
+> oc -n ${PROJECT} new-app --file=./ci/openshift/postgresql.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "ci/openshiftpostgresql.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "./ci/openshift/postgresql.dc.yaml" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Feedback Name=iitdfider
         * Memory Limit=512Mi
-        * PostgreSQL Connection Password=In0Yb6djOMHESKh5 # generated
+        * PostgreSQL Connection Password=OELXM8SPiIrsoWFf # generated
         * Database Volume Capacity=2Gi
 
 --> Creating resources ...
@@ -250,12 +251,29 @@ export FEEDBACK=iitd
     Run 'oc status' to view your app.
 ```
 
-### App Deployment
+#### Prepare DB for application install
 
-> oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+After thirty seconds, the database pod should be up.
+
+> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep ${FEEDBACK}fider-postgresql- | grep Running | awk '{print $1}')
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.json" to project csnr-devops-lab-deploy
+psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
+```
+
+The database responds with:
+```bash
+ALTER ROLE
+```
+
+Type `exit` to exit the remote shell.
+
+### Application Deployment
+
+> oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+
+```bash
+--> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.yaml" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Namespace=csnr-devops-lab-tools
@@ -264,7 +282,7 @@ export FEEDBACK=iitd
         * Feedback Product Name=iitdfider
         * Fider Go Environment=production
         * Fider application logging level=INFO
-        * Fider Go Environment=a7e8XLIJ57S2JR1vy7Nx5T73yfBk7ICN # generated
+        * Fider Go Environment=6UJRX20tiRTKH8hqc5ORAqConfnkhqrA # generated
         * SMTP Host=apps.smtp.gov.bc.ca
         * SMTP Port=25
         * SMTP User=Gary.T.Wong@gov.bc.ca
@@ -289,26 +307,14 @@ export FEEDBACK=iitd
     service "iitdfider" created
     route.route.openshift.io "iitdfider" created
 --> Success
-    Access your application via route 'iitdfider.pathfinder.gov.bc.ca' 
+    Access your application via route 'iitdfider.pathfinder.gov.bc.ca'
     Run 'oc status' to view your app.
 ```
 
-#### Perform Fider installation
+#### Log into the Fider app
 
-After 10 - 30 seconds, at least one pod should be up; remote into any one of these pods:
-
-> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep ${FEEDBACK}fider-postgresql- | grep Running | awk '{print $1}')
-
-```bash
-sh-4.2$ psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
-ALTER ROLE
-```
-Type `exit` to exit the remote shell.
-
-### Log into the Fider app
-
-The setup page is at:
-https://${FEEDBACK}fider.pathfinder.gov.bc.ca/signup
+After sixty seconds, you may navigate to the setup page at:
+https://iitdfider.pathfinder.gov.bc.ca/signup
 
 ![Admin SignUp](/docs/screenshots/SignUp.png)
 
@@ -323,7 +329,6 @@ unset TOOLS PROJECT FEEDBACK
 
 </details>
 
-
 ## FAQ
 
 * To login into the database, open the DB pod terminal (via OpenShift Console or oc rsh) and enter:
@@ -334,7 +339,7 @@ psql -U ${POSTGRESQL_USER} ${POSTGRESQL_DATABASE}
 
 * to clean-up database deployments:
 
-  To re-deploy *just* the database, first idle the dateabase service and then delete the deployed objects from the last run, with the correct FEEDBACK_NAME, such as:
+  To re-deploy *just* the database, first idle the database service and then delete the deployed objects from the last run, with the correct FEEDBACK_NAME, such as:
 
   ```bash
   oc -n <project> idle <feedback>fider-postgresql
@@ -370,25 +375,26 @@ Or if using environment variables:
 
   `oc -n ${PROJECT} delete all,secret,pvc,hpa -l app=${FEEDBACK}fider`
 
-
 * Git SubModule was created via:
 
 ```bash
 git submodule add https://github.com/getfider/fider
-cd fider
-git apply ../bcgov-notls.patch 
 ```
+
+    NOTE: In hindsight, we should've explicitly tracked the master branch
+    
+    > git submodule add -b master https://github.com/getfider/fider
+
 
   * To update this LimeSurvey git submodule from the upstream repo, from root of repo:
 
-```
-  git submodule update --remote 
+```bash
+  git submodule update --remote
 ```
 
 ## TODO
 
-* test DB backup/restore and transfer
-* convert ./ci/openshift/*.json to *.yml
+* test DB backup/restore and transfer with [Backup-Containers](https://github.com/BCDevOps/backup-container)
 * test out application upgrade (e.g. Fider updates their version)
 * check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
 
@@ -399,6 +405,7 @@ git apply ../bcgov-notls.patch
 * created fider-bcgov.bc.json file
 * integrated with apps.smtp.gov.bc.ca:25 without TLS (e.g. x509 error due to vwall.gov.bc.ca on cert)
 * health checks for each of the database container
+* convert ci/openshift/*.json to *.yaml
 
 ## SMTPS Issue
 
