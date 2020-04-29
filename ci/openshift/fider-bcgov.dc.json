@@ -15,7 +15,7 @@
             "description": "The OpenShift ImageStream name.",
             "displayName": "Image Stream",
             "name": "IS_NAME",
-            "value": "fider-notls"
+            "value": "fider-bcgov"
         },
         {
             "description": "Version of Feedback image to be used (e.g. v0.18.0)",
