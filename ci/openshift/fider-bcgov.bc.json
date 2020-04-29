@@ -9,7 +9,7 @@
       "name": "NAME",
       "displayName": "Name",
       "description": "A descriptive name of the image",
-      "value": "fider-gitsubmodule",
+      "value": "fider-bcgov",
       "required": true
     },
     {

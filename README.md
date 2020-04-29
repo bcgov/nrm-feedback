@@ -41,8 +41,8 @@ Once deployed, any visitors to the site will require a modern web browser (e.g. 
 
 ## Files
 
-* [OpenShift Fider app template](/openshift/fider.dc.json) for Fider application
-* [OpenShift Database service template](/openshift/postgresql.dc.json) for PostgreSQL Database, acting as the datastore for the Fider application
+* [OpenShift Fider app template](/ci/openshift/fider-bcgov.dc.json) for Fider application
+* [OpenShift Database service template](/ci/openshift/postgresql.dc.json) for PostgreSQL Database, acting as the datastore for the Fider application
 
 ## Build
 
@@ -50,32 +50,23 @@ Once deployed, any visitors to the site will require a modern web browser (e.g. 
 
 To create an image stream using this forked code (replace `<tools-namespace>` with your `-tools` project namespace).
 
-> oc -n &lt;tools-namespace&gt;  process -f openshift/fider.bc.json | oc -n &lt;tools-namespace&gt;  apply -f -
+> oc -n &lt;tools-namespace&gt; create istag fider-bcgov:latest
+
+> oc -n &lt;tools-namespace&gt;  process -f ci/openshift/fider-bcgov.bc.json | oc -n &lt;tools-namespace&gt;  apply -f -
+> oc -n &lt;tools-namespace&gt; start-build nrm-feedback
 
 Tag with the correct release version,  matching the `major.minor`  release tag at the source [repo](https://github.com/getfider/fider/releases).  For example:
 
-> oc -n &lt;tools-namespace&gt; tag fider-notls:latest fider-notls:0.18.0
+> oc -n &lt;tools-namespace&gt; tag fider-bcgov:latest fider-bcgov:0.18.0
+
+NOTE: To update our Fider image, we would update the submodule (e.g. `0.19.0`) and then tag *this* build as `latest`, and plan for a re-deploy using the newer image.
+
+> git submodule update --init --recursive
 
 ### Out-of-the-box Image
 
-If and when we solve the SMTPS issue, we should build directly off the Fider image, for example:
+If and when we solve the SMTPS issue, we should build directly off the Fider image, referencing `https://github.com/getfider/fider` in the deployment, and no longer use custom builds.
 
-1. Import a specific tagged release:
-
-> oc -n &lt;tools-namespace&gt; import-image fider:0.18.0 --from=getfider/fider:0.18.0 --confirm --insecure --reference-policy=local
-
-2. Once imported with the correct release number, tag it to explictly show the version:
-
-> oc -n &lt;tools-namespace&gt; tag fider:latest fider:0.18.0
-
-NOTE: To remove tags, the syntax is:
-
-```bash
-oc -n <tools-namespace> tag -d fider:latest
-oc -n <tools-namespace> tag -d fider:v0.18.0
-```
-
-NOTE: To update our Fider image, we would import the new version (e.g. `0.19.0`) and then tag *this* as `latest`, and plan for a re-deploy using the newer image.
 
 ## Deploy
 
@@ -83,7 +74,7 @@ NOTE: To update our Fider image, we would import the new version (e.g. `0.19.0`)
 
 Deploy the DB using the correct FEEDBACK_NAME parameter (e.g. an acronym that is prefixed to `fider`):
 
-> oc -n &lt;project&gt; new-app --file=openshift/postgresql.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;
+> oc -n &lt;project&gt; new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;
 
 All DB deployments are based on the out-of-the-box [OpenShift Database Image](https://docs.openshift.com/container-platform/3.11/using_images/db_images/postgresql.html).
 
@@ -94,7 +85,7 @@ Deploy the Application specifying:
 * your project namespace that contains the image, and 
 * a `@gov.bc.ca` email account that will be used with the `apps.smtp.gov.bc.ca` SMTP Email Server:
 
-> oc -n &lt;project&gt; new-app --file=./openshift/fider.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;fider -p IS_NAMESPACE=&lt;tools-namespace&gt; EMAIL_SMTP_USERNAME=&lt;Email.Address&gt;@gov.bc.ca
+> oc -n &lt;project&gt; new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=&lt;feedback&gt;fider -p IS_NAMESPACE=&lt;tools-namespace&gt; EMAIL_SMTP_USERNAME=&lt;Email.Address&gt;@gov.bc.ca
 
 ## Perform Fider installation
 
@@ -128,10 +119,10 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
 
 ### Database Deployment
 
-> oc -n csnr-devops-lab-deploy new-app --file=openshift/postgresql.dc.json -p FEEDBACK_NAME=acmefider
+> oc -n csnr-devops-lab-deploy new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=acmefider
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "openshift/postgresql.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "ci/openshiftpostgresql.dc.json" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Feedback Name=acmefider
@@ -152,14 +143,14 @@ As a concrete example of a feedback initiative with the acronym `acme`, deployed
 
 ### Application Deployment
 
-> oc -n csnr-devops-lab-deploy new-app --file=./openshift/fider.dc.json -p FEEDBACK_NAME=acmefider -p IS_NAMESPACE=csnr-devops-lab-tools EMAIL_SMTP_USERNAME=Porky.Pig@gov.bc.ca
+> oc -n csnr-devops-lab-deploy new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=acmefider -p IS_NAMESPACE=csnr-devops-lab-tools EMAIL_SMTP_USERNAME=Porky.Pig@gov.bc.ca
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./openshift/fider.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.json" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Namespace=csnr-devops-lab-tools
-        * Image Stream=fider-notls
+        * Image Stream=fider-bcgov
         * Version of Fider Product Feedback=0.18.0
         * Feedback Product Name=acmefider
         * Fider Go Environment=production
@@ -213,10 +204,10 @@ Type `exit` to exit the remote shell.
 ### Log into the Fider app
 
 The app is at https://acmefider.pathfinder.gov.bc.ca but will initially redirect you to https://acmefider.pathfinder.gov.bc.ca/signup, bringing you the screen:
-![Admin SignUp](/docs/images/SignUp.png)
+![Admin SignUp](/docs/screenshots/SignUp.png)
 
 Once you've confirmed the setup detail, you'll be sent a confirmation email, and you'll have to click the embedded link:
-![Confirmation Email](/docs/images/ConfirmEmail.png)
+![Confirmation Email](/docs/screenshots/ConfirmEmail.png)
 </details>
 
 ## Using Environmental variables to deploy
@@ -237,10 +228,10 @@ export FEEDBACK=iitd
 
 ### Database Deployment
 
-> oc -n ${PROJECT} new-app --file=openshift/postgresql.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider
+> oc -n ${PROJECT} new-app --file=ci/openshiftpostgresql.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "openshift/postgresql.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmfeedback-postgresql-dc" for "ci/openshiftpostgresql.dc.json" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Feedback Name=iitdfider
@@ -261,14 +252,14 @@ export FEEDBACK=iitd
 
 ### App Deployment
 
-> oc -n ${PROJECT} new-app --file=./openshift/fider.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+> oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.json -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
 
 ```bash
---> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./openshift/fider.dc.json" to project csnr-devops-lab-deploy
+--> Deploying template "csnr-devops-lab-deploy/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.json" to project csnr-devops-lab-deploy
 
      * With parameters:
         * Namespace=csnr-devops-lab-tools
-        * Image Stream=fider-notls
+        * Image Stream=fider-bcgov
         * Version of Fider Product Feedback=0.18.0
         * Feedback Product Name=iitdfider
         * Fider Go Environment=production
@@ -319,10 +310,10 @@ Type `exit` to exit the remote shell.
 The setup page is at:
 https://${FEEDBACK}fider.pathfinder.gov.bc.ca/signup
 
-![Admin SignUp](/docs/images/SignUp.png)
+![Admin SignUp](/docs/screenshots/SignUp.png)
 
 Once you've confirmed the setup detail, you'll be sent a confirmation email like this, and you'll have to click the link:
-![Confirmation Email](/docs/images/ConfirmEmail.png)
+![Confirmation Email](/docs/screenshots/ConfirmEmail.png)
 
 When finished, remember to unset the environment variables:
 
@@ -397,7 +388,7 @@ git apply ../bcgov-notls.patch
 ## TODO
 
 * test DB backup/restore and transfer
-* convert ./openshift/*.json to *.yml
+* convert ./ci/openshift/*.json to *.yml
 * test out application upgrade (e.g. Fider updates their version)
 * check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
 
@@ -405,7 +396,7 @@ git apply ../bcgov-notls.patch
 
 * health checks for application containers
 * appropriate resource limits (multi-replica pods supported)
-* created fider.bc.json file
+* created fider-bcgov.bc.json file
 * integrated with apps.smtp.gov.bc.ca:25 without TLS (e.g. x509 error due to vwall.gov.bc.ca on cert)
 * health checks for each of the database container
 
