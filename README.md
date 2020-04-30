@@ -50,7 +50,7 @@ To create an image stream using this forked code (replace `<tools-namespace>` wi
 
 > oc -n &lt;tools-namespace&gt; create istag fider-bcgov:latest  
 
-> oc -n &lt;tools-namespace&gt;  process -f ci/openshift/fider-bcgov.bc.yaml | oc -n &lt;tools-namespace&gt;  apply -f -  
+> oc -n &lt;tools-namespace&gt;  process -f ci/openshift/fider-bcgov.bc.yaml | oc -n &lt;tools-namespace&gt; apply -f -  
 
 > oc -n &lt;tools-namespace&gt; start-build nrm-feedback
 

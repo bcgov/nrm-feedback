@@ -37,7 +37,6 @@ objects:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          namespace: csnr-devops-lab-tools
           name: alpine:3.10
         dockerfilePath: Dockerfile.openshift
     output:
