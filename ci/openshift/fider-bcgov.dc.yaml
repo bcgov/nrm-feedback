@@ -1,6 +1,7 @@
 ---
 kind: Template
 apiVersion: v1
+message: A new Fider application, customized with noTLS, has been created in your project
 metadata:
   name: nrmf-feedback-dc
 parameters:
