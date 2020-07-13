@@ -81,13 +81,13 @@ parameters:
   - name: MEMORY_LIMIT
     value: 1Gi
   - name: CPU_REQUEST
-    value: 100m
+    value: 80m
   - name: MEMORY_REQUEST
-    value: 256Mi
+    value: 196Mi
   - name: REPLICA_MIN
     value: "2"
   - name: REPLICA_MAX
-    value: "2"
+    value: "3"
 objects:
   - kind: Secret
     apiVersion: v1
@@ -283,9 +283,6 @@ objects:
       creationTimestamp:
       labels:
         app: "${FEEDBACK_NAME}"
-      annotations:
-        haproxy.router.openshift.io/disable_cookies: "true"
-        haproxy.router.openshift.io/balance: "roundrobin"
     spec:
       host: "${FEEDBACK_NAME}.pathfinder.gov.bc.ca"
       to:
