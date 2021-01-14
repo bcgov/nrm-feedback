@@ -1,6 +1,6 @@
 ---
 kind: Template
-apiVersion: template.openshift.io/v1
+apiVersion: v1
 message: A new Fider Image, customized with noTLS, has been created in your project
 metadata:
   name: nrm-feedback-bc
