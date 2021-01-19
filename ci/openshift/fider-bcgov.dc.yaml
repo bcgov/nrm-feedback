@@ -81,14 +81,11 @@ parameters:
   - name: MEMORY_LIMIT
     value: 1Gi
   - name: CPU_REQUEST
-    value: 500m
-    # value: 100m
+    value: 80m
   - name: MEMORY_REQUEST
-    value: 1Gi
-    # value: 256Mi
+    value: 196Mi
   - name: REPLICA_MIN
-    value: "1"
-    # value: "2"
+    value: "2"
   - name: REPLICA_MAX
     value: "3"
 objects:
@@ -117,8 +114,7 @@ objects:
         rollingParams:
           updatePeriodSeconds: 1
           intervalSeconds: 1
-          timeoutSeconds: 600
-          # timeoutSeconds: 180
+          timeoutSeconds: 180
           maxUnavailable: 25%
           maxSurge: 25%
         resources: {}
@@ -232,7 +228,7 @@ objects:
                   path: "/"
                   port: 3000
                   scheme: HTTP
-                initialDelaySeconds: 60
+                initialDelaySeconds: 10
                 timeoutSeconds: 2
                 periodSeconds: 10
                 successThreshold: 1
@@ -245,20 +241,20 @@ objects:
           dnsPolicy: ClusterFirst
           securityContext: {}
           schedulerName: default-scheduler
-  # - apiVersion: autoscaling/v1
-  #   kind: HorizontalPodAutoscaler
-  #   metadata:
-  #     name: "${FEEDBACK_NAME}"
-  #     labels:
-  #       app: "${FEEDBACK_NAME}"
-  #   spec:
-  #     maxReplicas: "${{REPLICA_MAX}}"
-  #     minReplicas: "${{REPLICA_MIN}}"
-  #     scaleTargetRef:
-  #       apiVersion: v1
-  #       kind: DeploymentConfig
-  #       name: "${FEEDBACK_NAME}-app"
-  #     targetCPUUtilizationPercentage: 95
+  - apiVersion: autoscaling/v1
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: "${FEEDBACK_NAME}"
+      labels:
+        app: "${FEEDBACK_NAME}"
+    spec:
+      maxReplicas: "${{REPLICA_MAX}}"
+      minReplicas: "${{REPLICA_MIN}}"
+      scaleTargetRef:
+        apiVersion: v1
+        kind: DeploymentConfig
+        name: "${FEEDBACK_NAME}-app"
+      targetCPUUtilizationPercentage: 95
   - kind: Service
     apiVersion: v1
     metadata:
