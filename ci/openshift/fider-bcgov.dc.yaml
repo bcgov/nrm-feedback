@@ -29,7 +29,7 @@ parameters:
   - description: The Fider loggin level (DEBUG | INFO).
     displayName: Fider application logging level
     name: LOG_LEVEL
-    value: INFO
+    value: ERROR
   - description: JWT Secret.
     displayName: Fider Go Environment
     from: "[a-zA-Z0-9]{32}"
