@@ -25,7 +25,7 @@ parameters:
   displayName: Database Volume Capacity
   name: DB_VOLUME_CAPACITY
   required: true
-  value: 2Gi
+  value: 4Gi
 objects:
 - kind: Secret
   apiVersion: v1
