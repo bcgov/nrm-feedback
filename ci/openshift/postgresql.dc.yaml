@@ -25,7 +25,7 @@ parameters:
   displayName: Database Volume Capacity
   name: DB_VOLUME_CAPACITY
   required: true
-  value: 2Gi
+  value: 4Gi
 objects:
 - kind: Secret
   apiVersion: v1
@@ -100,7 +100,7 @@ objects:
             claimName: "${FEEDBACK_NAME}-postgresql"
         containers:
         - name: "${FEEDBACK_NAME}-postgresql"
-          image: docker-registry.default.svc:5000/openshift/postgresql@sha256:0400ad0dacf89cd6474b3b70c5b6b4c8466d0f36def998aba83aae61f38f3a53
+          image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:9
           ports:
           - containerPort: 5432
             protocol: TCP

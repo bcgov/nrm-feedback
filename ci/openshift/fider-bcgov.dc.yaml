@@ -8,7 +8,7 @@ parameters:
   - description: The OpenShift Namespace where the ImageStream resides.
     displayName: Namespace
     name: IS_NAMESPACE
-    value: b7cg3n-tools
+    value: 599f0a-tools
   - description: The OpenShift ImageStream name.
     displayName: Image Stream
     name: IS_NAME
@@ -145,7 +145,7 @@ objects:
         spec:
           containers:
             - name: fider-app
-              image: getfider/fider:stable
+              image: " "
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -284,7 +284,7 @@ objects:
       labels:
         app: "${FEEDBACK_NAME}"
     spec:
-      host: "${FEEDBACK_NAME}.pathfinder.gov.bc.ca"
+      host: "${FEEDBACK_NAME}.apps.silver.devops.gov.bc.ca"
       to:
         kind: Service
         name: "${FEEDBACK_NAME}"
