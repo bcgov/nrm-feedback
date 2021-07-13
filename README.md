@@ -293,7 +293,8 @@ export FEEDBACK=eao
 
 After thirty seconds, the database pod should be up.
 
-> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}-postgresql.\*-deploy" | grep Running | awk '{print $1}')
+> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-postgresql-.-deploy" | grep Running | grep fider | awk '{print $1}')
+
 
 ```bash
 psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
