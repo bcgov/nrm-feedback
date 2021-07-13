@@ -1,16 +1,34 @@
 ### Table of Contents
 
-<!-- TOC depthTo:2 -->
+<!-- TOC depthTo:1 -->
 
 - [NRM Fider](#nrm-fider)
   - [Prerequisites](#prerequisites)
   - [Files](#files)
   - [Build](#build)
+    - [Custom Image](#custom-image)
+    - [Out-of-the-box Image](#out-of-the-box-image)
   - [Deploy](#deploy)
+    - [Database Deployment](#database-deployment)
+      - [Prepare DB for application install](#prepare-db-for-application-install)
+    - [Application Deployment](#application-deployment)
+      - [Log into the Fider installation](#log-into-the-fider-installation)
+      - [Reset database account privileges](#reset-database-account-privileges)
   - [Example Deployment](#example-deployment)
+    - [Database Deployment](#database-deployment-1)
+      - [Prepare DB for application install](#prepare-db-for-application-install-1)
+    - [Application Deployment](#application-deployment-1)
+      - [Log into the Fider app](#log-into-the-fider-app)
   - [Using Environmental variables to deploy](#using-environmental-variables-to-deploy)
+    - [Set the environment variables](#set-the-environment-variables)
+    - [Database Deployment](#database-deployment-2)
+      - [Prepare DB for application install](#prepare-db-for-application-install-2)
+    - [Application Deployment](#application-deployment-2)
+      - [Log into the Fider app](#log-into-the-fider-app-1)
+  - [Integration with Platform SSO KeyCloak Shared instance](#integration-with-platform-sso-keycloak-shared-instance)
   - [FAQ](#faq)
   - [TODO](#todo)
+    - [Done](#done)
   - [SMTPS Issue](#smtps-issue)
 
 <!-- /TOC -->
@@ -354,6 +372,29 @@ unset TOOLS PROJECT FEEDBACK
 
 </details>
 
+
+## Integration with Platform SSO KeyCloak Shared instance
+
+After requesting access via https://github.com/BCDevOps/devops-requests, use the GUI to navigate to:
+
+Administration -> Site Settings
+
+Authentication -> Add New
+
+```bash
+OAuth2
+Client ID     : dds-portfolio
+Client Secret : f740feed-4780-4668-b1cf-0fa0f069ea90
+Authorize URL : https://dev.oidc.gov.bc.ca/auth/realms/onestopauth-basic/protocol/openid-connect/auth
+Token URL     : https://dev.oidc.gov.bc.ca/auth/realms/onestopauth-basic/protocol/openid-connect/token
+Scope: openid, email, address, phone, roles
+Profile API URL: (empty)
+JSON PATH
+	ID: 	sub
+	Name: 	name
+	Email: email	
+```
+
 ## FAQ
 
 - To login into the database, open the DB pod terminal (via OpenShift Console or oc rsh) and enter:
@@ -418,6 +459,7 @@ git submodule add https://github.com/getfider/fider
 
 ## TODO
 
+- document KeyCloak integration
 - test out application upgrade (e.g. Fider updates their version)
 - check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
 
