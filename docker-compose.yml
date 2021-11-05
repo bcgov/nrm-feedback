@@ -1,26 +1,37 @@
-version: '3'
+version: "3"
+# To restart w/o datea in the DB Directory: rm -rf ./var/fider/pg_data/
 services:
   db:
     env_file:
-    - ./.env  
+      - ./.env
     restart: always
     image: postgres:9.6
     volumes:
-      - ./var/fider/pg_data:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data:delegated
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
-      
+
+  # http://localhost:9999/signup?
   app:
     env_file:
-    - ./.env   
+      - ./.env
     restart: always
     build:
       context: ./fider
-      dockerfile: ../Dockerfile
+      dockerfile: ../Dockerfile.dev
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "dockerize -wait tcp://db:5432 -- ./fider migrate && ./fider",
+      ]
     ports:
       - "9999:3000"
     depends_on:
       - db
+
+volumes:
+  postgresql:

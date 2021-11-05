@@ -27,6 +27,7 @@
       - [Log into the Fider app](#log-into-the-fider-app-1)
   - [Integration with Platform SSO KeyCloak Shared instance](#integration-with-platform-sso-keycloak-shared-instance)
   - [FAQ](#faq)
+    - [Upgrade Fider submodule](#upgrade-fider-submodule)
   - [TODO](#todo)
     - [Done](#done)
   - [SMTPS Issue](#smtps-issue)
@@ -41,11 +42,8 @@ BC Gov's [SMTP](https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol) con
 
 ## Prerequisites
 
-Network Security Policy is in place:
+Network Security Policies are in place; Aporeto is no longer supported on OCP, so see https://developer.gov.bc.ca/Openshift-Useful-Pro-Tips 
 
-```bash
-oc -n 599f0a-tools process -f https://raw.githubusercontent.com/BCDevOps/platform-services/master/security/aporeto/docs/sample/quickstart-nsp.yaml NAMESPACE=599f0a-tools | oc -n 599f0a-tools create -f -
-```
 
 For builds:
 
@@ -458,11 +456,51 @@ git submodule add https://github.com/getfider/fider
   git submodule update --remote
 ```
 
+### Upgrade Fider submodule
+
+This is an example when updating from v19.0 to v19.1
+
+First check status of the submodle
+```
+~/p/nrm-feedback ❯❯❯ git submodule  status  
+-74ac88ed1f6dfac1a3adfb93eb9c8c325f0018a8 fider
+
+~/p/nrm-feedback ❯❯❯ more .gitmodules
+[submodule "fider"]
+        path = fider
+        url = https://github.com/getfider/fider
+```
+
+Update, although you don't really need the `--init`  anymore
+
+```
+~/p/nrm-feedback ❯❯❯ git submodule update --init --recursive 
+Submodule 'fider' (https://github.com/getfider/fider) registered for path 'fider'
+Cloning into '/Users/garywong/proj/nrm-feedback/fider'...
+Submodule path 'fider': checked out '74ac88ed1f6dfac1a3adfb93eb9c8c325f0018a8'
+
+~/p/nrm-feedback ❯❯❯ cd fider     
+~/p/n/fider ❯❯❯ git status 
+HEAD detached at 74ac88ed
+nothing to commit, working tree clean
+
+~/p/n/fider ❯❯❯ git checkout v0.19.1 
+Previous HEAD position was 74ac88ed enhancement: Patch on Avatar.tsx to activate name tooltip via title attribute (#842)
+HEAD is now at c962c411 chore: update version to 0.19.1
+
+~/p/n/fider ❯❯❯ git status     
+HEAD detached at v0.19.1
+nothing to commit, working tree clean
+```
+
+Although the `git checkout` can be against latest, we're choosing a specific tag. Note that git submodules won't be updated auotmatically unless the `git checkout` is run, and the parent rep commited.
+
 ## TODO
 
 - document KeyCloak integration
-- test out application upgrade (e.g. Fider updates their version)
 - check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
+
+
 
 ### Done
 
@@ -473,6 +511,7 @@ git submodule add https://github.com/getfider/fider
 - health checks for each of the database container
 - convert ci/openshift/_.json to _.yaml
 - tested DB backup/restore and transfer with [Backup-Containers](https://github.com/BCDevOps/backup-container)
+- tested `git submodule update`
 
 ## SMTPS Issue
 
