@@ -1,5 +1,5 @@
-version: "3"
-# To restart w/o datea in the DB Directory: rm -rf ./var/fider/pg_data/
+version: "3.8"
+
 services:
   db:
     env_file:
