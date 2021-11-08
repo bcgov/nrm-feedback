@@ -45,7 +45,7 @@ objects:
         dockerStrategy:
           from:
             kind: DockerImage
-            name: alpine:3.10
+            name: debian:buster-slim
           dockerfilePath: Dockerfile.openshift
       output:
         to:
