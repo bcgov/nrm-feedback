@@ -47,7 +47,7 @@ objects:
           from:
             kind: DockerImage
             name: alpine:3.10
-          dockerfilePath: ../Dockerfile.openshift
+          dockerfilePath: Dockerfile.openshift
       output:
         to:
           kind: ImageStreamTag
