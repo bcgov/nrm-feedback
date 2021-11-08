@@ -40,13 +40,14 @@ objects:
         git:
           uri: "${SOURCE_REPOSITORY_URL}"
           ref: "${SOURCE_REPOSITORY_REF}"
+        contextDir: fider
       strategy:
         type: Docker
         dockerStrategy:
           from:
             kind: DockerImage
             name: alpine:3.10
-          dockerfilePath: Dockerfile.openshift
+          dockerfilePath: ../Dockerfile.openshift
       output:
         to:
           kind: ImageStreamTag
