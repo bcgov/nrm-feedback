@@ -18,8 +18,7 @@ parameters:
     value: https://github.com/garywong-bc/nrm-feedback
   - name: SOURCE_REPOSITORY_REF
     required: true
-    # value: master
-    value: feature/upgrade-fider-to-v19.1
+    value: master
 objects:
   - kind: ImageStream
     apiVersion: v1
@@ -53,8 +52,8 @@ objects:
           name: "${NAME}:${VERSION}"
       resources:
         limits:
-          cpu: 250m
-          memory: 2048Mi
+          cpu: 500m
+          memory: 4096Mi
         requests:
-          cpu: 100m
-          memory: 1024Mi
+          cpu: 200m
+          memory: 2048Mi

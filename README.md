@@ -27,7 +27,7 @@
       - [Log into the Fider app](#log-into-the-fider-app-1)
   - [Integration with Platform SSO KeyCloak Shared instance](#integration-with-platform-sso-keycloak-shared-instance)
   - [FAQ](#faq)
-    - [Upgrade Fider submodule](#upgrade-fider-submodule)
+    - [Upgrade Fider Git submodule](#upgrade-fider-git-submodule)
   - [TODO](#todo)
     - [Done](#done)
   - [SMTPS Issue](#smtps-issue)
@@ -291,7 +291,7 @@ export FEEDBACK=eao
 
 After thirty seconds, the database pod should be up.
 
-> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-postgresql-.-deploy" | grep Running | grep fider | awk '{print $1}')
+> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-postgresql-.-deploy" | grep Running | grep ${FEEDBACK}fider | awk '{print $1}')
 
 
 ```bash
@@ -308,7 +308,9 @@ Type `exit` to exit the remote shell.
 
 ### Application Deployment
 
-> oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=\${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+```
+oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+```
 
 ```bash
 --> Deploying template "599f0a-dev/nrmf-feedback-dc" for "./ci/openshift/fider-bcgov.dc.yaml" to project 599f0a-dev
@@ -456,7 +458,7 @@ git submodule add https://github.com/getfider/fider
   git submodule update --remote
 ```
 
-### Upgrade Fider submodule
+### Upgrade Fider Git submodule
 
 This is an example when updating from v19.0 to v19.1
 
@@ -471,7 +473,7 @@ First check status of the submodle
         url = https://github.com/getfider/fider
 ```
 
-Update, although you don't really need the `--init`  anymore
+Update, although we don't really need the `--init`  anymore, after the initial time.
 
 ```
 ~/p/nrm-feedback ❯❯❯ git submodule update --init --recursive 
@@ -495,11 +497,21 @@ nothing to commit, working tree clean
 
 Although the `git checkout` can be against latest, we're choosing a specific tag. Note that git submodules won't be updated auotmatically unless the `git checkout` is run, and the parent rep commited.
 
+NOTE: Fider often updates the `fider\Dockerfile` so be sure to integrate the changes to `.\Dockerfile.openshift` and `.\Dockerfile.dev` 
+
+For the former, be sure to change:
+```
+COPY . .
+```
+to
+```
+COPY fider .
+```
+
 ## TODO
 
 - document KeyCloak integration
 - check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
-
 
 
 ### Done
