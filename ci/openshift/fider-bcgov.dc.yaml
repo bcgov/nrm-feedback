@@ -201,6 +201,8 @@ objects:
                   displayName: Database connection
                   name: DATABASE_URL
                   value: postgres://$(POSTGRESQL_USERNAME):$(POSTGRESQL_PASSWORD)@$(POSTGRESQL_DB_HOST):$(POSTGRESQL_PORT)/${FEEDBACK_NAME}?sslmode=disable
+                - name: HOST_DOMAIN
+                  value: ${FEEDBACK_NAME}.apps.silver.devops.gov.bc.ca"
                 - name: JWT_SECRET
                   valueFrom:
                     secretKeyRef:
