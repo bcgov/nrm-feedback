@@ -471,6 +471,7 @@ First check status of the submodle
 [submodule "fider"]
         path = fider
         url = https://github.com/getfider/fider
+        branch = main        
 
 ~/p/nrm-feedback ❯❯❯ git submodule update --remote --merge
 ```
