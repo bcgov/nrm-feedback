@@ -52,8 +52,8 @@ objects:
           name: "${NAME}:${VERSION}"
       resources:
         limits:
-          cpu: 500m
+          cpu: 700m
           memory: 4096Mi
         requests:
-          cpu: 200m
-          memory: 2048Mi
+          cpu: 500m
+          memory: 3020Mi
