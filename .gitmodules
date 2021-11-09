@@ -1,3 +1,4 @@
 [submodule "fider"]
 	path = fider
 	url = https://github.com/getfider/fider
+	branch = main
