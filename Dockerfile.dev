@@ -8,7 +8,7 @@ ARG buildnumber=local
 RUN mkdir /server
 WORKDIR /server
 
-COPY fider .
+COPY . .
 RUN BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 make build-server
 
 #################
@@ -19,17 +19,10 @@ FROM node:16-buster AS ui-builder
 RUN mkdir /ui
 WORKDIR /ui
 
-COPY fider .
+COPY . .
 RUN npm ci
 RUN make build-ssr
 RUN make build-ui
-
-# Override SMTTP TLS
-RUN sed -i -e '/auth :=/d' \
-  -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, smtpConfig.EnableStartTLS, email/g' \
-  -e 's/, a gosmtp.Auth, from/, from/g' -e '/if a != nil {/,+7d' \
-  -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
-  app/services/email/smtp/smtp.go 
 
 ################
 ### Runtime Step
@@ -37,7 +30,13 @@ RUN sed -i -e '/auth :=/d' \
 FROM debian:buster-slim
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates
+RUN apt-get install -y ca-certificates wget
+
+# 'dockerize -wait'
+ENV DOCKERIZE_VERSION v0.6.1
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 RUN mkdir /app
 WORKDIR /app
