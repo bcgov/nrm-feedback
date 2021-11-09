@@ -15,7 +15,7 @@ parameters:
     value: latest
   - name: SOURCE_REPOSITORY_URL
     required: true
-    value: https://github.com/garywong-bc/nrm-feedback
+    value: https://github.com/bcgov/nrm-feedback
   - name: SOURCE_REPOSITORY_REF
     required: true
     value: master
