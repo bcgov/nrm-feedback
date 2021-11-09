@@ -471,31 +471,12 @@ First check status of the submodle
 [submodule "fider"]
         path = fider
         url = https://github.com/getfider/fider
+
+~/p/nrm-feedback ❯❯❯ git submodule update --remote --merge
 ```
 
-Update, although we don't really need the `--init`  anymore, after the initial time.
-
-```
-~/p/nrm-feedback ❯❯❯ git submodule update --init --recursive 
-Submodule 'fider' (https://github.com/getfider/fider) registered for path 'fider'
-Cloning into '/Users/garywong/proj/nrm-feedback/fider'...
-Submodule path 'fider': checked out '74ac88ed1f6dfac1a3adfb93eb9c8c325f0018a8'
-
-~/p/nrm-feedback ❯❯❯ cd fider     
-~/p/n/fider ❯❯❯ git status 
-HEAD detached at 74ac88ed
-nothing to commit, working tree clean
-
-~/p/n/fider ❯❯❯ git checkout v0.19.1 
-Previous HEAD position was 74ac88ed enhancement: Patch on Avatar.tsx to activate name tooltip via title attribute (#842)
-HEAD is now at c962c411 chore: update version to 0.19.1
-
-~/p/n/fider ❯❯❯ git status     
-HEAD detached at v0.19.1
-nothing to commit, working tree clean
-```
-
-Although the `git checkout` can be against latest, we're choosing a specific tag. Note that git submodules won't be updated auotmatically unless the `git checkout` is run, and the parent rep commited.
+NOTE: Git Submodule update instructions above are yet to be 100% confirmed.
+TODO - confirm instructions work as advertise above
 
 NOTE: Fider often updates the `fider\Dockerfile` so be sure to integrate the changes to `.\Dockerfile.openshift` and `.\Dockerfile.dev` 
 
