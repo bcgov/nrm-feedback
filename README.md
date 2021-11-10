@@ -261,7 +261,9 @@ export FEEDBACK=eao
 
 ### Database Deployment
 
-> oc -n ${PROJECT} new-app --file=./ci/openshift/postgresql.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider
+```
+oc -n ${PROJECT} new-app --file=./ci/openshift/postgresql.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider
+```
 
 ```bash
 --> Deploying template "599f0a-dev/nrmfeedback-postgresql-dc" for "./ci/openshift/postgresql.dc.yaml" to project 599f0a-dev
@@ -291,9 +293,11 @@ export FEEDBACK=eao
 
 After thirty seconds, the database pod should be up.
 
-> oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-postgresql-.-deploy" | grep Running | grep ${FEEDBACK}fider | awk '{print $1}')
+```
+oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-postgresql-.-deploy" | grep Running | grep ${FEEDBACK}fider | awk '{print $1}')
+```
 
-
+On the shell, enter:
 ```bash
 psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
 ```
@@ -309,7 +313,7 @@ Type `exit` to exit the remote shell.
 ### Application Deployment
 
 ```
-oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca
+oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca -p IS_VERSION=0.19.1    
 ```
 
 ```bash
