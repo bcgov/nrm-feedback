@@ -26,11 +26,8 @@ RUN make build-ui
 
 # Override SMTTP TLS
 RUN sed -i -e '/auth :=/d' \
-  -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, email/g' \
-  -e 's/, enableStartTLS bool, a gosmtp.Auth, from string,/, from string,/g' \
-  -e 's/if enableStartTLS {/if true {/g' \
-  -e '/if a != nil {/,+7d' \
-  -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
+  -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
+  #  -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
   app/services/email/smtp/smtp.go && \
   cat app/services/email/smtp/smtp.go
 
