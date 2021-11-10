@@ -326,11 +326,11 @@ oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_N
      * With parameters:
         * Namespace=599f0a-tools
         * Image Stream=fider-bcgov
-        * Version of Fider Product Feedback=0.18.0
-        * Feedback Product Name=eaofider
+        * Version of Fider Product Feedback=0.19.1
+        * Feedback Product Name=gwfider
         * Fider Go Environment=production
-        * Fider application logging level=INFO
-        * Fider Go Environment=c1B5usKLsfCQE3DGeoxqS10ROlgOhtQ4 # generated
+        * Fider application logging level=ERROR
+        * Fider Go Environment=ivbfbDFjYyK7omNoVllbvJbhyiHwJd1R # generated
         * SMTP Host=apps.smtp.gov.bc.ca
         * SMTP Port=25
         * SMTP User=Gary.T.Wong@gov.bc.ca
@@ -343,19 +343,19 @@ oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_N
         * GitHub SoMe Secret=
         * CPU_LIMIT=500m
         * MEMORY_LIMIT=1Gi
-        * CPU_REQUEST=500m
-        * MEMORY_REQUEST=1Gi
+        * CPU_REQUEST=80m
+        * MEMORY_REQUEST=196Mi
         * REPLICA_MIN=2
         * REPLICA_MAX=3
 
 --> Creating resources ...
-    secret "eaofider-jwt" created
-    deploymentconfig.apps.openshift.io "eaofider-app" created
-    horizontalpodautoscaler.autoscaling "eaofider" created
-    service "eaofider" created
-    route.route.openshift.io "eaofider" created
+    secret "gwfider-jwt" created
+    deploymentconfig.apps.openshift.io "gwfider-app" created
+    horizontalpodautoscaler.autoscaling "gwfider" created
+    service "gwfider" created
+    route.route.openshift.io "gwfider" created
 --> Success
-    Access your application via route 'eaofider.apps.silver.devops.gov.bc.ca'
+    Access your application via route 'gwfider.apps.silver.devops.gov.bc.ca' 
     Run 'oc status' to view your app.
 ```
 
