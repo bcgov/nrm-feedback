@@ -27,6 +27,10 @@
       - [Log into the Fider app](#log-into-the-fider-app-1)
   - [Integration with Platform SSO KeyCloak Shared instance](#integration-with-platform-sso-keycloak-shared-instance)
   - [FAQ](#faq)
+    - [DB login](#db-login)
+    - [DB Cleanup](#db-cleanup)
+    - [App Cleanup](#app-cleanup)
+    - [Git Submodule](#git-submodule)
     - [Upgrade Fider Git submodule](#upgrade-fider-git-submodule)
   - [TODO](#todo)
     - [Done](#done)
@@ -313,7 +317,7 @@ Type `exit` to exit the remote shell.
 ### Application Deployment
 
 ```
-oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca -p IS_VERSION=0.19.1    
+oc -n ${PROJECT} new-app --file=./ci/openshift/fider-bcgov.dc.yaml -p FEEDBACK_NAME=${FEEDBACK}fider -p IS_NAMESPACE=${TOOLS} -p EMAIL_SMTP_USERNAME=Daffy.Duck@gov.bc.ca    
 ```
 
 ```bash
@@ -402,12 +406,14 @@ JSON PATH
 
 ## FAQ
 
+### DB login
 - To login into the database, open the DB pod terminal (via OpenShift Console or oc rsh) and enter:
 
 ```bash
 psql -U ${POSTGRESQL_USER} ${POSTGRESQL_DATABASE}
 ```
 
+### DB Cleanup
 - to clean-up database deployments:
 
   To re-deploy _just_ the database, first idle the database service and then delete the deployed objects from the last run, with the correct FEEDBACK_NAME, such as:
@@ -425,6 +431,8 @@ psql -U ${POSTGRESQL_USER} ${POSTGRESQL_DATABASE}
   oc -n ${PROJECT} idle ${FEEDBACK}fider-postgresql
   oc -n ${PROJECT} delete secret/${FEEDBACK}fider-postgresql svc/${FEEDBACK}fider-postgresql pvc/${FEEDBACK}fider-postgresql dc/${FEEDBACK}fider-postgresql
 ```
+
+### App Cleanup
 
 - to clean-up application deployments:
 
@@ -445,6 +453,8 @@ Or if using environment variables:
   or if using environment variables:
 
   `oc -n ${PROJECT} delete all,secret,pvc,hpa -l app=${FEEDBACK}fider`
+
+### Git Submodule
 
 - Git SubModule was created via:
 
