@@ -5,18 +5,6 @@ message: A new Fider application, customized with noTLS, has been created in you
 metadata:
   name: nrmf-feedback-dc
 parameters:
-  - description: The OpenShift Namespace where the ImageStream resides.
-    displayName: Namespace
-    name: IS_NAMESPACE
-    value: 599f0a-tools
-  - description: The OpenShift ImageStream name.
-    displayName: Image Stream
-    name: IS_NAME
-    value: fider-bcgov
-  - description: Version of Feedback image to be used (e.g. v0.18.0)
-    displayName: Version of Fider Product Feedback
-    name: IS_VERSION
-    value: 0.18.0
   - description: The short-name of the Feedback Product, lower-case with hyphen.
     displayName: Feedback Product Name
     name: FEEDBACK_NAME
@@ -121,15 +109,6 @@ objects:
         activeDeadlineSeconds: 21600
       triggers:
         - type: ConfigChange
-        - type: ImageChange
-          imageChangeParams:
-            automatic: true
-            containerNames:
-              - "${FEEDBACK_NAME}-fider-app"
-            from:
-              kind: ImageStreamTag
-              namespace: "${IS_NAMESPACE}"
-              name: "${IS_NAME}:${IS_VERSION}"
       replicas: "${{REPLICA_MIN}}"
       revisionHistoryLimit: 10
       test: false
@@ -143,9 +122,15 @@ objects:
             deploymentconfig: "${FEEDBACK_NAME}-app"
           annotations: {}
         spec:
+          imagePullSecrets:
+            - name: docker-pull-passthru
+          # hostAliases:
+          #   - ip: "10.1.2.3"
+          #     hostnames:
+          #       - "${FEEDBACK_NAME}.apps.silver.devops.gov.bc.ca"
           containers:
             - name: "${FEEDBACK_NAME}-fider-app"
-              image: " "
+              image: "docker-remote.artifacts.developer.gov.bc.ca/getfider/fider:SHA_0c5f208"
               ports:
                 - containerPort: 3000
                   protocol: TCP
