@@ -10,8 +10,12 @@ WORKDIR /server
 
 COPY fider .
 
-# Override SMTTP TLS
-COPY smtp-override.go app/services/email/smtp/smtp.go
+# Override SMTP TLS
+RUN sed -i -e '/auth :=/d' \
+    -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, true, nil, email/g' \
+    -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
+    app/services/email/smtp/smtp.go && \
+    cat app/services/email/smtp/smtp.go
 
 RUN BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 make build-server
 
@@ -24,8 +28,6 @@ RUN mkdir /ui
 WORKDIR /ui
 
 COPY fider .
-# Override SMTTP TLS
-COPY smtp-override.go app/services/email/smtp/smtp.go
 
 RUN npm ci
 RUN make build-ssr
