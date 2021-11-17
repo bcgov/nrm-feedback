@@ -106,12 +106,12 @@ var Send = func(localName, serverAddress string, from string, to []string, msg [
 	if err = c.Hello(localName); err != nil {
 		return err
 	}
-	if ok, _ := c.Extension("STARTTLS"); ok {
-		config := &tls.Config{InsecureSkipVerify: true, ServerName: host}
-		if err = c.StartTLS(config); err != nil {
-			return err
-		}
-	}
+	// if ok, _ := c.Extension("STARTTLS"); ok {
+	// 	config := &tls.Config{InsecureSkipVerify: true, ServerName: host}
+	// 	if err = c.StartTLS(config); err != nil {
+	// 		return err
+	// 	}
+	// }
 	if err = c.Mail(from); err != nil {
 		return err
 	}
