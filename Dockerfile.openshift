@@ -9,6 +9,10 @@ RUN mkdir /server
 WORKDIR /server
 
 COPY fider .
+
+# Override SMTTP TLS
+COPY smtp-override.go app/services/email/smtp/smtp.go
+
 RUN BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 make build-server
 
 #################
@@ -20,12 +24,12 @@ RUN mkdir /ui
 WORKDIR /ui
 
 COPY fider .
+# Override SMTTP TLS
+COPY smtp-override.go app/services/email/smtp/smtp.go
+
 RUN npm ci
 RUN make build-ssr
 RUN make build-ui
-
-# Override SMTTP TLS
-COPY smtp-override.go app/services/email/smtp/smtp.go
 
 ################
 ### Runtime Step
