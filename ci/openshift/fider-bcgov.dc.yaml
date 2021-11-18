@@ -131,7 +131,6 @@ objects:
               namespace: "${IS_NAMESPACE}"
               name: "${IS_NAME}:${IS_VERSION}"
       replicas: "${{REPLICA_MIN}}"
-      replicas: 1
       revisionHistoryLimit: 10
       test: false
       selector:
@@ -204,8 +203,6 @@ objects:
                   value: postgres://$(POSTGRESQL_USERNAME):$(POSTGRESQL_PASSWORD)@$(POSTGRESQL_DB_HOST):$(POSTGRESQL_PORT)/${FEEDBACK_NAME}?sslmode=disable
                 - name: HOST_DOMAIN
                   value: ${FEEDBACK_NAME}.apps.silver.devops.gov.bc.ca
-                - name: HOST_MODE
-                  value: multi
                 - name: JWT_SECRET
                   valueFrom:
                     secretKeyRef:
@@ -221,8 +218,8 @@ objects:
               livenessProbe:
                 exec:
                   command:
-                  - ./fider
-                  - ping
+                    - ./fider
+                    - ping
                 initialDelaySeconds: 60
                 periodSeconds: 15
                 successThreshold: 1
@@ -230,8 +227,8 @@ objects:
               readinessProbe:
                 exec:
                   command:
-                  - ./fider
-                  - ping
+                    - ./fider
+                    - ping
                 initialDelaySeconds: 30
                 timeoutSeconds: 15
                 periodSeconds: 30
@@ -248,14 +245,14 @@ objects:
   - apiVersion: autoscaling/v1
     kind: HorizontalPodAutoscaler
     metadata:
-      name: "${FEEDBACK_NAME}"
+      name: "${FEEDBACK_NAME}-app"
       labels:
-        app: "${FEEDBACK_NAME}"
+        app: "${FEEDBACK_NAME}-app"
     spec:
       maxReplicas: "${{REPLICA_MAX}}"
       minReplicas: "${{REPLICA_MIN}}"
       scaleTargetRef:
-        apiVersion: v1
+        apiVersion: apps.openshift.io/v1
         kind: DeploymentConfig
         name: "${FEEDBACK_NAME}-app"
       targetCPUUtilizationPercentage: 95
