@@ -13,7 +13,6 @@
       - [Prepare DB for application install](#prepare-db-for-application-install)
     - [Application Deployment](#application-deployment)
       - [Log into the Fider installation](#log-into-the-fider-installation)
-      - [Reset database account privileges](#reset-database-account-privileges)
   - [Example Deployment](#example-deployment)
     - [Database Deployment](#database-deployment-1)
       - [Prepare DB for application install](#prepare-db-for-application-install-1)
@@ -108,7 +107,7 @@ Although Fider is setup to _auto-install_ upon deployment, the OpenShift DB temp
 
 > oc -n &lt;project&gt; rsh $(oc -n &lt;project&gt; get pods | grep -v -e "<feedback>-postgresql.\*-deploy" | grep Running | awk '{print $1}')
 
-> psql ${POSTGRESQL_DATABASE} -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
+> psql ${POSTGRESQL_DATABASE}  -c "CREATE EXTENSION pg_trgm;"
 
 > exit
 
@@ -127,16 +126,6 @@ Deploy the Application specifying:
 #### Log into the Fider installation
 
 After sixty seconds, the application will have finished the initial install. Open the app in a browser, to set the admin user. The URL will be of the form `https://<xyz>fider.apps.silver.devops.gov.bc.ca/`.
-
-#### Reset database account privileges
-
-Revoke the superuser privilege afterwards:
-
-> oc -n &lt;project&gt; rsh $(oc -n &lt;project&gt; get pods | grep xyz-postgresql- | grep Running | awk '{print $1}')
-
-> psql ${POSTGRESQL_DATABASE} -c "ALTER USER ${POSTGRESQL_USER} WITH NOSUPERUSER"
-
-NOTE that the `${POSTGRESQL_DATABASE}` text is exactly as written, since the app has access to these environment variables (set during the `new-app` step).
 
 ## Example Deployment
 
@@ -181,13 +170,7 @@ After thirty seconds, the database pod should be up.
 
 Run the install commands in this shell:
 
-> psql ${POSTGRESQL_DATABASE} -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
-
-The database responds with:
-
-```bash
-ALTER ROLE
-```
+> psql ${POSTGRESQL_DATABASE}  -c "CREATE EXTENSION pg_trgm;"
 
 Type `exit` to exit the remote shell.
 
@@ -303,16 +286,9 @@ oc -n ${PROJECT} rsh $(oc -n ${PROJECT} get pods | grep -v -e "${FEEDBACK}fider-
 
 On the shell, enter:
 ```bash
-psql ${POSTGRESQL_DATABASE}  -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
+psql ${POSTGRESQL_DATABASE}  -c "CREATE EXTENSION pg_trgm;"
+exit
 ```
-
-The database responds with:
-
-```bash
-ALTER ROLE
-```
-
-Type `exit` to exit the remote shell.
 
 ### Application Deployment
 
