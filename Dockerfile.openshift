@@ -64,4 +64,4 @@ HEALTHCHECK --timeout=5s CMD ./fider ping
 
 CMD ./fider migrate && ./fider
 # BC Gov: Set non-root user
-USER 1001
+# USER 1001

@@ -222,8 +222,8 @@ objects:
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 60
-                timeoutSeconds: 5
-                periodSeconds: 10
+                timeoutSeconds: 15
+                periodSeconds: 30
                 successThreshold: 1
                 failureThreshold: 6
               readinessProbe:
@@ -231,9 +231,9 @@ objects:
                   path: "/"
                   port: 3000
                   scheme: HTTP
-                initialDelaySeconds: 10
-                timeoutSeconds: 2
-                periodSeconds: 10
+                initialDelaySeconds: 30
+                timeoutSeconds: 15
+                periodSeconds: 30
                 successThreshold: 1
                 failureThreshold: 10
               terminationMessagePath: "/dev/termination-log"
