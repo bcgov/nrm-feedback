@@ -26,7 +26,7 @@ parameters:
     displayName: Fider Go Environment
     name: GO_ENV
     value: production
-  - description: The Fider loggin level (DEBUG | INFO).
+  - description: The Fider loggin level (DEBUG | INFO | ERROR).
     displayName: Fider application logging level
     name: LOG_LEVEL
     value: ERROR

@@ -26,6 +26,11 @@ RUN mkdir /ui
 WORKDIR /ui
 
 COPY fider .
+# Override SMTP TLS
+RUN sed -i -e '/auth :=/d' \
+    -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
+    -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
+    app/services/email/smtp/smtp.go 
 
 RUN npm ci
 RUN make build-ssr
