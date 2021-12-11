@@ -413,13 +413,13 @@ psql -U ${POSTGRESQL_USER} ${POSTGRESQL_DATABASE}
 - to clean-up application deployments:
 
 ```bash
-  oc -n <project> delete dc/<feedback>fider-app svc/<feedback>fider route/<feedback>fider secret/<feedback>fider-jwt hpa/<feedback>fider
+  oc -n <project> delete dc/<feedback>fider-app svc/<feedback>fider route/<feedback>fider secret/<feedback>fider-jwt hpa/<feedback>fider-app
 ```
 
 Or if using environment variables:
 
 ```bash
-  oc -n ${PROJECT} delete dc/${FEEDBACK}fider-app svc/${FEEDBACK}fider route/${FEEDBACK}fider secret/${FEEDBACK}fider-jwt hpa/${FEEDBACK}fider
+  oc -n ${PROJECT} delete dc/${FEEDBACK}fider-app svc/${FEEDBACK}fider route/${FEEDBACK}fider secret/${FEEDBACK}fider-jwt hpa/${FEEDBACK}fider-app
 ```
 
 - to reset _all_ deployed objects (this will destroy all data and persistent volumes). Only do this on a botched initial install or if you have the DB backed up and ready to restore into the new wiped database.
