@@ -18,7 +18,7 @@ parameters:
     value: https://github.com/bcgov/nrm-feedback
   - name: SOURCE_REPOSITORY_REF
     required: true
-    value: ab3feae7965573b7d796eae5fc8c0354284274f6
+    value: master
 objects:
   - kind: ImageStream
     apiVersion: v1
