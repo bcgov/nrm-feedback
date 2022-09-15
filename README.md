@@ -246,6 +246,15 @@ export PROJECT=599f0a-dev
 export FEEDBACK=eao
 ```
 
+On Windows the commands to set environment variables would instead be:
+```cmd
+set TOOLS=599f0a-tools
+set PROJECT=599f0a-dev
+set FEEDBACK=eao
+```
+
+If running commands in a Windows environment (and not in the openshift terminal), environment variables are formatted as %ENV_NAME% instead of <ENV_NAME> or ${ENV_NAME}. Commands in these instructions may need to be adapted for Windows.
+
 ### Database Deployment
 
 ```
