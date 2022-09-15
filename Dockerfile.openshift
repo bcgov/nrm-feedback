@@ -1,7 +1,9 @@
+ARG DOCKER_REGISTRY=docker-remote.artifacts.developer.gov.bc.ca
+
 #####################
 ### Server Build Step
 #####################
-FROM golang:1.18 AS server-builder 
+FROM $DOCKER_REGISTRY/golang:1.18 AS server-builder 
 
 ARG buildnumber=local
 
@@ -21,7 +23,7 @@ RUN BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 GOFLAGS="-buildvcs=false"
 #################
 ### UI Build Step
 #################
-FROM node:16-buster AS ui-builder 
+FROM $DOCKER_REGISTRY/node:16-buster AS ui-builder 
 
 RUN mkdir /ui
 WORKDIR /ui
@@ -40,7 +42,7 @@ RUN make build-ui
 ################
 ### Runtime Step
 ################
-FROM debian:stable-slim
+FROM $DOCKER_REGISTRY/debian:stable-slim
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates
