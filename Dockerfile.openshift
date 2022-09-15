@@ -1,4 +1,4 @@
-ARG DOCKER_REGISTRY=docker-remote.artifacts.developer.gov.bc.ca
+ARG DOCKER_REGISTRY=artifacts.developer.gov.bc.ca/docker-remote
 
 #####################
 ### Server Build Step

@@ -46,11 +46,11 @@ objects:
             kind: DockerImage
             name: debian:stable-slim
           dockerfilePath: Dockerfile.openshift
-          buildArgs:
-            - name: DOCKER_REGISTRY
-              value: docker-remote.artifacts.developer.gov.bc.ca
-          pullSecret:
-            name: docker-pull-passthru
+          # buildArgs:
+          #   - name: DOCKER_REGISTRY
+          #     value: artifacts.developer.gov.bc.ca/docker-remote
+          # pullSecret:
+          #   name: docker-pull-passthru
       output:
         to:
           kind: ImageStreamTag
