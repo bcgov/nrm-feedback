@@ -1,6 +1,6 @@
 ---
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 message: A new Fider Image, customized with noTLS, has been created in your project
 metadata:
   name: nrm-feedback-bc
@@ -46,14 +46,19 @@ objects:
             kind: DockerImage
             name: debian:buster-slim
           dockerfilePath: Dockerfile.openshift
+          buildArgs:
+            - name: DOCKER_REGISTRY
+              value: docker-remote.artifacts.developer.gov.bc.ca          
+          pullSecret:
+            name: docker-pull-passthru          
       output:
         to:
           kind: ImageStreamTag
           name: "${NAME}:${VERSION}"
       resources:
         limits:
-          cpu: 700m
-          memory: 4096Mi
+          cpu: 1500m
+          memory: 1200Mi
         requests:
           cpu: 500m
-          memory: 3020Mi
+          memory: 500Mi
