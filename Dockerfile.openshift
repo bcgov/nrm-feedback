@@ -22,7 +22,7 @@ RUN sed -i -e '/auth :=/d' \
 #################
 ### UI Build Step
 #################
-FROM $DOCKER_REGISTRY/node:19-buster AS ui-builder 
+FROM $DOCKER_REGISTRY/node:16-buster AS ui-builder 
 
 RUN mkdir /ui
 WORKDIR /ui
