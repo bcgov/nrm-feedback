@@ -1,6 +1,6 @@
 ---
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 message: A new PostgreSQL application has been created in your project
 metadata:
   name: nrmfeedback-postgresql-dc
@@ -25,7 +25,7 @@ parameters:
     displayName: Database Volume Capacity
     name: DB_VOLUME_CAPACITY
     required: true
-    value: 4Gi
+    value: 2Gi
 objects:
   - kind: Secret
     apiVersion: v1
