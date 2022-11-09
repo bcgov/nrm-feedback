@@ -35,13 +35,14 @@ RUN sed -i -e '/auth :=/d' \
     app/services/email/smtp/smtp.go 
 
 RUN npm ci
+RUN npx browserslist@latest --update-db 
 RUN make build-ssr
 RUN make build-ui
 
 ################
 ### Runtime Step
 ################
-FROM $DOCKER_REGISTRY/debian:buster-slim
+FROM debian:buster-slim
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates
