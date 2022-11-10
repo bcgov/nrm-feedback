@@ -3,31 +3,32 @@ ARG DOCKER_REGISTRY=docker.io/library
 #####################
 ### Server Build Step
 #####################
-FROM $DOCKER_REGISTRY/golang:1.16.6-buster AS server-builder 
+FROM --platform=${TARGETPLATFORM:-linux/amd64} $DOCKER_REGISTRY/golang:1.17-buster AS server-builder 
 
-ARG buildnumber=local
 
 RUN mkdir /server
 WORKDIR /server
 
+COPY fider/go.mod fider/go.sum ./
+RUN go mod download
+
 COPY fider .
 
-# BC Gov: Override SMTP TLS
+ARG COMMITHASH
 RUN sed -i -e '/auth :=/d' \
     -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
     -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
     app/services/email/smtp/smtp.go && \
-    BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 make build-server
+    COMMITHASH=${COMMITHASH} GOOS=${TARGETOS} GOARCH=${TARGETARCH} make build-server
 
 #################
 ### UI Build Step
 #################
-FROM $DOCKER_REGISTRY/node:16-buster AS ui-builder 
+FROM --platform=${TARGETPLATFORM:-linux/amd64} $DOCKER_REGISTRY/node:16-buster AS ui-builder 
 
-RUN mkdir /ui
 WORKDIR /ui
 
-COPY fider .
+COPY fider/package.json fider/package-lock.json ./
 # Override SMTP TLS
 RUN sed -i -e '/auth :=/d' \
     -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
@@ -35,19 +36,20 @@ RUN sed -i -e '/auth :=/d' \
     app/services/email/smtp/smtp.go 
 
 RUN npm ci
-RUN npx browserslist@latest --update-db 
+# RUN npx browserslist@latest --update-db 
+
+COPY fider .
 RUN make build-ssr
 RUN make build-ui
 
 ################
 ### Runtime Step
 ################
-FROM debian:buster-slim
+FROM --platform=${TARGETPLATFORM:-linux/amd64} $DOCKER_REGISTRY/debian:buster-slim
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates
 
-RUN mkdir /app
 WORKDIR /app
 
 COPY --from=server-builder /server/migrations /app/migrations
