@@ -30,10 +30,9 @@ WORKDIR /ui
 
 COPY fider/package.json fider/package-lock.json ./
 RUN npm ci
-# RUN npx browserslist@latest --update-db 
+RUN npx browserslist@latest --update-db 
 
 COPY fider .
-npx browserslist@latest --update-db
 # Override SMTP TLS
 RUN sed -i -e '/auth :=/d' \
     -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
