@@ -46,6 +46,7 @@ objects:
           buildArgs:
             - name: DOCKER_REGISTRY
               value: artifacts.developer.gov.bc.ca/docker-remote
+              # value: docker.io/library              
           pullSecret:
             name: docker-pull-passthru
       output:
