@@ -33,11 +33,12 @@ RUN npm ci
 # RUN npx browserslist@latest --update-db 
 
 COPY fider .
+npx browserslist@latest --update-db
 # Override SMTP TLS
-# RUN sed -i -e '/auth :=/d' \
-#     -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
-#     -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
-#     app/services/email/smtp/smtp.go 
+RUN sed -i -e '/auth :=/d' \
+    -e 's/servername, smtpConfig.EnableStartTLS, auth, email/servername, false, nil, email/g' \
+    -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
+    app/services/email/smtp/smtp.go 
 RUN make build-ssr
 RUN make build-ui
 
