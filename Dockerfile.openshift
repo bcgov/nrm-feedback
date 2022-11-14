@@ -39,7 +39,7 @@ RUN sed -i -e '/auth :=/d' \
     -e 's/Config{ServerName: host}/Config{InsecureSkipVerify: true, ServerName: host}/g' \
     app/services/email/smtp/smtp.go 
 RUN make build-ssr
-RUN make build-ui -d
+RUN make build-ui
 
 ################
 ### Runtime Step

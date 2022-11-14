@@ -83,9 +83,9 @@ To create an image stream using this forked code (replace `<tools-namespace>` wi
 
 Tag with the correct release version, matching the `major.minor` release tag at the source [repo](https://github.com/getfider/fider/releases). For example:
 
-> oc -n &lt;tools-namespace&gt; tag fider-bcgov:latest fider-bcgov:0.18.0
+> oc -n &lt;tools-namespace&gt; tag fider-bcgov:latest fider-bcgov:0.21.1
 
-NOTE: To update our Fider image, we would update the submodule (e.g. `0.19.0`) and then tag _this_ build as `latest`, and plan for a re-deploy using the newer image.
+NOTE: To update our Fider image, we would update the submodule (e.g. `0.21.1`) and then tag _this_ build as `latest`, and plan for a re-deploy using the newer image.
 
 > git submodule update --init --recursive
 
@@ -381,13 +381,13 @@ Authentication -> Add New
 OAuth2
 Client ID     : dds-portfolio
 Client Secret : <xxxxx>-<xxxx>-<xxxx>-<xxxx>-<xxxxx>
-Authorize URL : https://dev.oidc.gov.bc.ca/auth/realms/onestopauth-basic/protocol/openid-connect/auth
-Token URL     : https://dev.oidc.gov.bc.ca/auth/realms/onestopauth-basic/protocol/openid-connect/token
-Scope: openid, email, address, phone, roles
+Authorize URL : https://loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/auth
+Token URL     : https://loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/token
+Scope: openid
 Profile API URL: (empty)
 JSON PATH
 	ID: 	sub
-	Name: 	name
+	Name: 	displayname
 	Email: email	
 ```
 
