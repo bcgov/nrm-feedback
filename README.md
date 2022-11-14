@@ -493,18 +493,17 @@ COPY fider .
 
 ## TODO
 
-- document KeyCloak integration
 - check for image triggers which force a reploy (image tags.. latest -> v0.19.0)
-
+- work around OCP Build issue which shows up as `Error shutting down storage: A layer is mounted: layer is in use by a container` but this masks the underlying [issue](https://github.com/go-gitea/gitea/issues/19455) - solution is apparently to fix file permissions, or to work around by `git config --global --add safe.directory`.  I've temporarily downgraded [Golang](https://go.dev/) to an older version (pre-v18) to avoid this.
 
 ### Done
-
+- documented KeyCloak integration
 - health checks for application containers
 - appropriate resource limits (multi-replica pods supported)
 - created fider-bcgov.bc.json file
 - integrated with apps.smtp.gov.bc.ca:25 without TLS (e.g. x509 error due to vwall.gov.bc.ca on cert)
-- health checks for each of the database container
-- convert ci/openshift/_.json to _.yaml
+- added health checks for each of the database container
+- converted ci/openshift/_.json to _.yaml
 - tested DB backup/restore and transfer with [Backup-Containers](https://github.com/BCDevOps/backup-container)
 - tested `git submodule update`
 
