@@ -1,44 +1,42 @@
 #####################
 ### Server Build Step
 #####################
-FROM golang:1.16.6-buster AS server-builder 
+FROM --platform=${TARGETPLATFORM:-linux/amd64} golang:1.17-buster AS server-builder 
 
-ARG buildnumber=local
 
 RUN mkdir /server
 WORKDIR /server
 
-COPY . .
-RUN BUILDNUMBER=${buildnumber} GOOS=linux GOARCH=amd64 make build-server
+COPY fider/go.mod fider/go.sum ./
+RUN go mod download
+
+COPY fider .
+
+ARG COMMITHASH
+RUN COMMITHASH=${COMMITHASH} GOOS=${TARGETOS} GOARCH=${TARGETARCH} make build-server
 
 #################
 ### UI Build Step
 #################
-FROM node:16-buster AS ui-builder 
+FROM --platform=${TARGETPLATFORM:-linux/amd64} node:16-buster AS ui-builder 
 
-RUN mkdir /ui
 WORKDIR /ui
 
-COPY . .
+COPY fider/package.json fider/package-lock.json ./
 RUN npm ci
+
+COPY fider .
 RUN make build-ssr
 RUN make build-ui
 
 ################
 ### Runtime Step
 ################
-FROM debian:buster-slim
+FROM --platform=${TARGETPLATFORM:-linux/amd64} debian:buster-slim
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates wget
+RUN apt-get install -y ca-certificates
 
-# 'dockerize -wait'
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
-RUN mkdir /app
 WORKDIR /app
 
 COPY --from=server-builder /server/migrations /app/migrations

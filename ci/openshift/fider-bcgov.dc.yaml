@@ -1,6 +1,6 @@
 ---
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 message: A new Fider application, customized with noTLS, has been created in your project
 metadata:
   name: nrmf-feedback-dc
@@ -16,7 +16,7 @@ parameters:
   - description: Version of Feedback image to be used (e.g. v0.18.0)
     displayName: Version of Fider Product Feedback
     name: IS_VERSION
-    value: 0.19.1
+    value: 0.21.1
   - description: The short-name of the Feedback Product, lower-case with hyphen.
     displayName: Feedback Product Name
     name: FEEDBACK_NAME
